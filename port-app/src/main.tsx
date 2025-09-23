@@ -4,6 +4,8 @@ import sequelize from './database/database';
 import defineContainerModel from './database/models/Container';
 import defineMovementModel from './database/models/Movement';
 import defineInspectionPhotoModel from './database/models/InspectionPhoto';
+import { ipcMain } from 'electron';
+import { getDashboardStats, getContainersInYard, createMovement } from './services';
 
 // Initialize the models
 defineContainerModel(sequelize);
@@ -51,9 +53,28 @@ const createWindow = () => {
   mainWindow.webContents.openDevTools();
 };
 
+
 app.on('ready', () => {
   initializeDatabase();
   createWindow();
+
+  // ----> AÑADE ESTE BLOQUE AQUÍ <----
+  ipcMain.handle('get-dashboard-stats', async () => {
+    return await getDashboardStats();
+  });
+
+  ipcMain.handle('get-containers-in-yard', async () => {
+    return await getContainersInYard();
+  });
+
+  ipcMain.handle('create-movement', async (_event, data) => {
+  try {
+    return await createMovement(data);
+  } catch (error: any) { // <-- Se añade ': any' para definir el tipo
+    console.error('Error creating movement:', error);
+    return { success: false, message: error.message }; // Ahora puedes acceder a .message sin error
+  }
+  });
 });
 
 app.on('window-all-closed', () => {
