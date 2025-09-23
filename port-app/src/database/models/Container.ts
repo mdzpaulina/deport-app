@@ -1,6 +1,5 @@
 import { DataTypes, Sequelize } from 'sequelize';
 
-// We export a function that defines the model.
 export default (sequelize: Sequelize) => {
   sequelize.define('Container', {
     id: {
@@ -15,6 +14,12 @@ export default (sequelize: Sequelize) => {
     entryDate: {
       type: DataTypes.DATE,
       allowNull: false,
+    },
+    status: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'CLEAN',
+      comment: 'The condition of the container (e.g., CLEAN, DAMAGED)'
     },
   }, {
     timestamps: false
